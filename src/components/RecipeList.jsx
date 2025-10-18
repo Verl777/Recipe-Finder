@@ -1,40 +1,39 @@
-/**
- * RecipeList Component
- * --------------------
- * Displays a list of recipes fetched from TheMealDB API.
- * Each recipe shows its image, name, category, and cuisine.
- */
-function RecipeList({ recipes }) {
-  // Show message if no recipes were found
+// src/components/RecipeList.jsx
+import React from "react";
+import { Link } from "react-router-dom";
+
+const RecipeList = ({ recipes }) => {
   if (!recipes || recipes.length === 0) {
-    return <p className="text-center text-gray-500">No recipes found 🥲</p>;
+    return <p className="text-gray-500 text-center mt-10">No recipes found.</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
       {recipes.map((recipe) => (
         <div
           key={recipe.idMeal}
-          className="bg-white rounded-lg shadow hover:shadow-lg transition p-4"
+          className="bg-white rounded-xl shadow-lg hover:shadow-2xl p-4 transition"
         >
-          {/* Recipe thumbnail image */}
           <img
             src={recipe.strMealThumb}
             alt={recipe.strMeal}
-            className="rounded-lg mb-3 w-full h-48 object-cover"
+            className="rounded-xl w-full h-56 object-cover"
           />
+          <h3 className="mt-4 text-lg font-semibold">{recipe.strMeal}</h3>
+          <p className="text-sm text-gray-500 mt-1">{recipe.strArea}</p>
 
-          {/* Recipe title */}
-          <h3 className="font-semibold text-lg mb-1">{recipe.strMeal}</h3>
+          <Link
+           to={`/recipe/${recipe.idMeal}`}
+           state={{ recipe }} // Pass recipe data through navigation state
+           className="inline-flex items-center gap-2 text-indigo-700 bg-indigo-100 hover:bg-indigo-200 px-4 py-2 rounded-lg transition duration-200"
+          >
+           View Details
+          </Link>
 
-          {/* Category and Cuisine info */}
-          <p className="text-sm text-gray-500">
-            {recipe.strCategory} • {recipe.strArea}
-          </p>
         </div>
       ))}
     </div>
   );
-}
+};
 
 export default RecipeList;

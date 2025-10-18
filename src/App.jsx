@@ -1,38 +1,81 @@
-import { useState } from "react";
+// src/App.jsx
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SearchBar from "./components/SearchBar";
 import RecipeList from "./components/RecipeList";
-import { fetchMealsByName } from "./api/mealService";
+import RecipeDetails from "./pages/RecipeDetails";
+import Navbar from "./components/Navbar";
+import About from "./pages/About";
 
-/**
- * App Component
- * -------------
- * Main container for the Recipe Finder app.
- * Handles search functionality and displays recipe results.
- */
-function App() {
-  const [recipes, setRecipes] = useState([]); // State to hold list of fetched recipes
+const BASE_URL = import.meta.env.VITE_MEALDB_API;
 
-  // Function triggered when user submits a search query
-  const handleSearch = async (query) => {
-    const results = await fetchMealsByName(query); // Fetch data from API
-    setRecipes(results); // Update recipe list
+const App = () => {
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchRecipes = async (query) => {
+    if (!query) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}search.php?s=${query}`);
+      const data = await res.json();
+      setRecipes(data.meals || []);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <header className="text-center py-6 bg-white shadow">
-        <h1 className="text-3xl font-bold text-gray-800">🍳 Recipe Finder</h1>
-        <p className="text-gray-500">Find your favorite dishes by name</p>
-      </header>
+    <Router>
+      {/* Navbar */}
+      <Navbar />
 
-      {/* Search Bar */}
-      <SearchBar onSearch={handleSearch} />
+      {/* Routes */}
+      <Routes>
+        {/* Home Page */}
+        <Route
+          path="/"
+          element={
+            <div
+              className="min-h-[calc(100vh-4rem)] bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center text-center text-white relative p-6"
+              style={{
+                backgroundImage: "url('/images/food-bg.jpg')",
+              }}
+            >
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-black/50"></div>
 
-      {/* Recipe List */}
-      <RecipeList recipes={recipes} />
-    </div>
+              {/* Content */}
+              <div className="relative z-10 max-w-3xl mx-auto">
+                <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-orange-400 drop-shadow-lg">
+                  Welcome to Recipe Finder 🍽️
+                </h1>
+                <p className="text-lg md:text-xl font-medium mb-8 text-gray-100">
+                  Search and explore amazing dishes from around the world!
+                </p>
+
+                <SearchBar onSearch={fetchRecipes} />
+
+                {loading ? (
+                  <p className="text-center text-gray-300 mt-10">
+                    Loading recipes...
+                  </p>
+                ) : (
+                  <RecipeList recipes={recipes} />
+                )}
+              </div>
+            </div>
+          }
+        />
+
+        {/* Recipe Details Page */}
+        <Route path="/recipe/:id" element={<RecipeDetails />} />
+         <Route path="/about" element={<About />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

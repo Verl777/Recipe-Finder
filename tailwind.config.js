@@ -1,8 +1,12 @@
 module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
-  darkMode: false, // You can set it to 'media' or 'class' if needed
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        navy: "#0a192f",
+        burnt: "#cc5500",
+      },
+    },
   },
   plugins: [],
 };
